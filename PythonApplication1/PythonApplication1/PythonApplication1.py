@@ -1,4 +1,4 @@
-# 8 Queens problem solved using Back tracking
+# N Queens problem solved using Back tracking
 #
 #
 # Solving for possible column position for each row such that
@@ -6,26 +6,28 @@
 # If there is a 'Queen' conflict, using backTracking algorithm 
 # to rework on the previous col postion found. 
 
-def PrintBoard2(ColPos):
-    for row in range(8):
-        for col in range(8):
+import time
+
+def PrintBoard2(ColPos, size):
+    for row in range(size):
+        for col in range(size):
             if ColPos[row]== col:
                 print(1, end=' ')
             else:
                 print(0, end=' ')
         print()
 
-def diagonallyClashing(ColPos, row, col):
+def diagonallyClashing(ColPos, row, col, size):
     indecesAlreadyTaken = []
     conflict = False
-    for ro in range(8):
+    for ro in range(size):
         if ColPos[ro] != -1:
-            indecesAlreadyTaken += [ro *8 + ColPos[ro]]
+            indecesAlreadyTaken += [ro *size + ColPos[ro]]
     conflitingPos = []
-    conflitingPos += list(range(row*8 + col, -1, -9))[1:][0:col]  # trailingLeftDiag 
-    conflitingPos += list(range(row*8+col,0, -7))[1:][:7-col] # trailingRightDiag 
-    conflitingPos += list(range((row*8 + col), 64, 7))[1:col+1] # leadingLeftDiag 
-    conflitingPos += list(range((row*8 + col),64,9))[1:8-col] # leadingRightDiag 
+    conflitingPos += list(range(row*size + col, -1, -size-1))[1:][0:col]  # trailingLeftDiag 
+    conflitingPos += list(range(row*size+col, 0, 1-size))[1:][:(size-1)-col] # trailingRightDiag 
+    conflitingPos += list(range(row*size + col, size*size, size-1))[1:col+1] # leadingLeftDiag 
+    conflitingPos += list(range(row*size + col, size*size, size+1))[1:size-col] # leadingRightDiag 
 
     #print(row, col, indecesAlreadyTaken, end='  ')
     for pos in conflitingPos:
@@ -35,21 +37,21 @@ def diagonallyClashing(ColPos, row, col):
     #print(conflitingPos, conflict)
     return conflict
 
-def isValidColPos(ColPos, row, col):
+def isValidColPos(ColPos, row, col, size):
     if any(x == col for x in ColPos):
         return False
-    elif diagonallyClashing(ColPos, row, col):
+    elif diagonallyClashing(ColPos, row, col, size):
         return False
     else:
         return True
 
-def SolveColPositions(ColPos):
-    for row in range(8):
+def SolveColPositions(ColPos, size):
+    for row in range(size):
         if ColPos[row] == -1:
-            for col in range(8):
-                if isValidColPos(ColPos, row, col):
+            for col in range(size):
+                if isValidColPos(ColPos, row, col, size):
                     ColPos[row] = col
-                    if (SolveColPositions(ColPos)):
+                    if (SolveColPositions(ColPos, size)):
                         return True
                     else:
                         ColPos[row] = -1
@@ -57,9 +59,14 @@ def SolveColPositions(ColPos):
     return True
 
 
-ColPositions = [-1]*8
-solved = SolveColPositions(ColPositions)
+size = 12
+#for size in range(4, 30):
+start = time.time()
+ColPositions = [-1]*size
+solved = SolveColPositions(ColPositions, size)
+print(size, time.time() - start)
+
 print()
 print(solved, ColPositions)
 print()
-PrintBoard2(ColPositions)
+PrintBoard2(ColPositions, size)
